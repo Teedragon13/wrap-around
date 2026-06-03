@@ -29,7 +29,7 @@
   align: top + right,
   width: 50%,
   padding: (h: 1em),
-  indent-first-line: true
+  indent-first-line: false
 ) = {context [
     #let original-spacing = par.spacing
     #set par(spacing: 0em)

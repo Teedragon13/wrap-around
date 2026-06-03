@@ -22,9 +22,9 @@
   let children = sequence-to-split.children
 
   // Split children
-  let a = calc.floor(children.len() / 2)
+  let a = children.len()
   let r = true
-  let i = a
+  let i = 0
   let height
   while true {
     if target-is-top {
@@ -41,19 +41,69 @@
     }
     a = calc.floor(a / 2)
     if xor(height < target-height, target-is-top) {
-      i -= a
+      i = calc.clamp(i - a, 0, children.len() - 1)
+      
+      // Treat mutltiple refs as one child
+      let child-to-check = children.at(i)
+      if child-to-check.func() == ref or child-to-check.func() == cite or child-to-check.func() == space {
+        while (i - 1) >= 0 and (i - 1) < children.len() {
+          child-to-check = children.at(i - 1)
+          if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {
+            break
+          }
+          i -= 1
+        }
+      }
     } else {
-      i += a
+      i = calc.clamp(i + a, 0, children.len() - 1)
+      
+      // Treat mutltiple refs as one child
+      let child-to-check = children.at(i)
+      if child-to-check.func() == ref or child-to-check.func() == cite or child-to-check.func() == space {
+        while (i + 1) >= 0 and (i + 1) < children.len() {
+          child-to-check = children.at(i + 1)
+          if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {
+            break
+          }
+          i += 1
+        }
+      }
     }
-    i = calc.clamp(i, 0, children.len() - 1)
 
     if (a <= 0) {break}
   }
   // Make sure height one step greater than target-height
   while (height < target-height and i > 0 and i < children.len()) {
-    if (target-is-top) {i += 1}
-    else {i -= 1}
+    if (target-is-top) {
+      i += 1
 
+      // Treat mutltiple refs as one child
+      let child-to-check = children.at(i)
+      if child-to-check.func() == ref or child-to-check.func() == cite or child-to-check.func() == space {
+        while (i + 1) < children.len() {
+          child-to-check = children.at(i + 1)
+          if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {
+            break
+          }
+          i += 1
+        }
+      }
+    } else {
+      i -= 1
+
+      // Treat mutltiple refs as one child
+      let child-to-check = children.at(i)
+      if child-to-check.func() == ref or child-to-check.func() == cite or child-to-check.func() == space {
+        while (i - 1) < children.len() {
+          child-to-check = children.at(i - 1)
+          if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {
+            break
+          }
+          i -= 1
+        }
+      }
+    }
+    
     if target-is-top {
       let part = split-content.top + children.slice(0, i).join()
       height = measure(part, width: top-width).height
@@ -65,6 +115,18 @@
   // Add children until line is filled
   let j = i
   while j < children.len() {
+    // Treat mutltiple refs as one child
+    let child-to-check = children.at(j)
+    if child-to-check.func() == ref or child-to-check.func() == cite or child-to-check.func() == space {
+      while (j + 1) < children.len() {
+        child-to-check = children.at(j + 1)
+        if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {
+          break
+        }
+        j += 1
+      }
+    }
+
     let top-part = split-content.top + children.slice(0, (j + 1)).join()
     if (height != measure(top-part, width: top-width).height) {break}
     
@@ -77,11 +139,11 @@
   let top-splitter = i - 1
   while true {
     let child-to-check = children.at(top-splitter)
-    if child-to-check.func() != space {break}
+    if child-to-check.func() != space and child-to-check.func() != ref and child-to-check.func() != cite {break}
     top-splitter -= 1
   }
   let bottom-splitter = top-splitter + 1
-
+  
   top-sequence = children.slice(0, top-splitter).join()
   let child-to-split = children.at(top-splitter)
   bottom-sequence = children.slice(bottom-splitter, children.len()).join()
@@ -207,15 +269,21 @@
   bottom-width,
 ) = {
   let result = (top-part: content-to-split, bottom-part: [])
-
+  
+  assert(content-to-split.func() != ref, message: "content-to-split is a ref. Normally split-sequence should prevent this from happening.")
+  assert(content-to-split.func() != cite, message: "content-to-split is a cite. Normally split-sequence should prevent this from happening.")
+  assert(content-to-split.func() != space, message: "content-to-split is a space. Normally split-sequence should prevent this from happening.")
+  
   if content-to-split.func() == sequence {
     result = split-squence(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
   } else if content-to-split.func() == styled {
     result = split-styled(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
   } else if content-to-split.func() == text {
     result = split-text(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
+  } else if content-to-split.func() == parbreak {
+    // Default
   } else {
-    result = (top-part: result.top-part, bottom-part: [#result.bottom-part No splitter for #content-to-split.func(). #content-to-split.fields()])
+    panic(content-to-split, content-to-split.func())
   }
 
   return result
