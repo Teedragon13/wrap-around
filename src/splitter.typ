@@ -65,8 +65,6 @@
   // Add children until line is filled
   let j = i
   while j < children.len() {
-    // Sollte es eigentlich nicht brauchen wenn sequence splitter richting funkt
-
     let top-part = split-content.top + children.slice(0, (j + 1)).join()
     if (height != measure(top-part, width: top-width).height) {break}
     
@@ -143,7 +141,9 @@
 
   let words = text-to-split.text.split(" ")
 
-  let a = int(words.len() / 2)
+  // Split text
+  let a = calc.floor(words.len() / 2)
+  let r = true
   let i = a
   let height
   while true {
@@ -155,14 +155,19 @@
       height = measure(part, width: bottom-width).height
     }
 
-    let error = calc.rem(a, 2)
-    a = int(a / 2)
-    if (a < 1) {break}
+    if (calc.odd(a)) {
+      if (r) {a += 1}
+      r = not r
+    }
+    a = calc.floor(a / 2)
     if xor(height < target-height, target-is-top) {
       i -= a
     } else {
-      i += a + error
+      i += a
     }
+    i = calc.clamp(i, 0, words.len() - 1)
+
+    if (a <= 0) {break}
   }
   // Make sure height one step greater than target-height
   while (height < target-height and i > 0 and i < words.len()) {
@@ -178,15 +183,13 @@
     }
   }
   // Add words until line is filled
-  while true {
-    let j = i + 1
-
-    if (j >= words.len()) {break} // Sollte es eigentlich nicht brauchen wenn sequence splitter richting funkt
-
+  let j = i
+  while j < words.len() {
     let top-part = split-content.top + words.slice(0, j).join(" ")
-
     if (height != measure(top-part, width: top-width).height) {break}
+
     i = j
+    j += 1
   }
   
   top-text = words.slice(0, i).join(" ")
