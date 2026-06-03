@@ -8,9 +8,11 @@
   first-line-indent: 1em
 )
 
+
+
 #lorem(50)
 
-#wrap(align: horizon + right)[
+#wrap(align: horizon)[
   #text(fill: red, lorem(3))
   #text(fill: orange, lorem(4))
   #text(fill: yellow, lorem(2))
@@ -29,96 +31,69 @@
 
 #pagebreak()
 
-#lorem(50)
+#let lorem-length = 200
 
 - align: #{top + left}
 
 #wrap(align: top + left)[
-  #lorem(200)
+  // #lorem(75)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
-
-#lorem(50)
-
-#pagebreak()
-
-#lorem(50)
 
 - align: #{top + left}
 
 #wrap(align: top + right)[
-  #lorem(200)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
 
-#lorem(50)
-
 #pagebreak()
-
-#lorem(50)
 
 - align: #{horizon + left}
 
 #wrap(align: horizon + left)[
-  #lorem(200)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
-
-#lorem(50)
-
-#pagebreak()
-
-#lorem(50)
 
 - align: #{horizon + left}
 
 #wrap(align: horizon + right)[
-  #lorem(200)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
 
-#lorem(50)
-
 #pagebreak()
-
-#lorem(50)
 
 - align: #{bottom + left}
 
 #wrap(align: bottom + left)[
-  #lorem(200)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
-
-#lorem(50)
-
-#pagebreak()
-
-#lorem(50)
 
 - align: #{bottom + right}
 
 #wrap(align: bottom + right)[
-  #lorem(200)
+  #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
     box(fill: red, width: 100%, height: 5cm)
   )
 ]
-
-#lorem(50)
