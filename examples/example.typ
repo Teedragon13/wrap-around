@@ -12,7 +12,7 @@
 
 #lorem(50)
 
-#wrap(align: horizon)[
+#wrap(alignment: horizon)[
   #text(fill: red, lorem(3))
   #text(fill: orange, lorem(4))
   #text(fill: yellow, lorem(2))
@@ -35,7 +35,7 @@
 
 - align: #{top + left}
 
-#wrap(align: top + left)[
+#wrap(alignment: top + left)[
   // #lorem(75)
   #lorem(lorem-length)
 ][
@@ -46,7 +46,7 @@
 
 - align: #{top + left}
 
-#wrap(align: top + right)[
+#wrap(alignment: top + right)[
   #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
@@ -58,7 +58,7 @@
 
 - align: #{horizon + left}
 
-#wrap(align: horizon + left)[
+#wrap(alignment: horizon + left)[
   #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
@@ -68,7 +68,7 @@
 
 - align: #{horizon + left}
 
-#wrap(align: horizon + right)[
+#wrap(alignment: horizon + right)[
   #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
@@ -80,7 +80,7 @@
 
 - align: #{bottom + left}
 
-#wrap(align: bottom + left)[
+#wrap(alignment: bottom + left)[
   #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",
@@ -90,7 +90,7 @@
 
 - align: #{bottom + right}
 
-#wrap(align: bottom + right)[
+#wrap(alignment: bottom + right)[
   #lorem(lorem-length)
 ][
   #figure(caption: "Some figure",

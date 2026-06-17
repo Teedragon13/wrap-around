@@ -26,9 +26,9 @@
 #let wrap(
   wrapper-body,
   wrapped-body,
-  align: top + right,
+  alignment: top + right,
   width: 50%,
-  padding: (h: 1em),
+  padding: (h: 1em, v: 0.5em),
   indent-first-line: false
 ) = {context [
     #let original-spacing = par.spacing
@@ -55,20 +55,22 @@
         size.width,
         wrapper-width,
         wrapped-height,
-        align.y != top,
-        align.y != bottom,
+        alignment.y != top,
+        alignment.y != bottom,
       )
+
+      let inner-height = measure(result.inner, width: wrapper-width).height
 
       let inner-wrapper = block(width: 100%)[
         #set par(spacing: original-spacing)
-        #if indent-first-line and align.y == top {h(par.first-line-indent.amount)}
+        #if indent-first-line and alignment.y == top {h(par.first-line-indent.amount)}
         #result.inner
-        #if align.y != bottom {linebreak(justify: par.justify)}
+        #if alignment.y != bottom {linebreak(justify: par.justify)}
       ]
 
       let outer-top-wrapper = block(width: 100%)[
         #set par(spacing: original-spacing)
-        #if indent-first-line and align.y != top {h(par.first-line-indent.amount)}
+        #if indent-first-line and alignment.y != top {h(par.first-line-indent.amount)}
         #result.outer-top
         #linebreak(justify: par.justify)
       ]
@@ -81,21 +83,21 @@
       [
         #set par(spacing: par.leading)
 
-        #if align.y != top {outer-top-wrapper}
+        #if alignment.y != top {outer-top-wrapper}
 
         #box(width: 100%, grid(
-          columns: if align.x == left {
+          columns: if alignment.x == left {
             (width, 100% - width)
           } else {
             (100% - width, width)
           },
-          align: horizon,
+          align: if inner-height < wrapped-height {top} else {horizon},
 
-          if align.x == left {wrapped} else {inner-wrapper},
-          if align.x == left {inner-wrapper} else {wrapped}
+          if alignment.x == left {wrapped} else {inner-wrapper},
+          if alignment.x == left {inner-wrapper} else {wrapped}
         ))
 
-        #if align.y != bottom {outer-bottom-wrapper}
+        #if alignment.y != bottom {outer-bottom-wrapper}
       ]
     })
     #box(width: 100%, height: 0cm)

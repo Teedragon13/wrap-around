@@ -189,6 +189,29 @@
   return (top-part: styled(..top-styled), bottom-part: styled(..bottom-styled))
 }
 
+#let split-emph(
+  split-content,
+  emph-to-split,
+  target-is-top,
+  target-height,
+  top-width,
+  bottom-width,
+  split
+) = {
+  let body = emph-to-split.body
+
+  let result = split(
+    (top: split-content.top, bottom: split-content.bottom),
+    body,
+    target-is-top,
+    target-height,
+    top-width,
+    bottom-width
+  )
+
+  return (top-part: emph(result.top-part), bottom-part: emph(result.bottom-part))
+}
+
 #let split-text(
   split-content,
   text-to-split,
@@ -280,6 +303,8 @@
     result = split-styled(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
   } else if content-to-split.func() == text {
     result = split-text(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
+  } else if content-to-split.func() == emph {
+    result = split-emph(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
   } else if content-to-split.func() == parbreak {
     // Default
   } else {
