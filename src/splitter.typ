@@ -333,7 +333,7 @@
       let outer-height = (full-height - inner-height) / 2
       let target-height = measure(inner-part, width: full-width).height * (outer-height / full-height)
 
-      let result = split((top: [], bottom: []), inner-part, true, target-height - 1em.to-absolute(), full-width, inner-width)
+      let result = split((top: [], bottom: []), inner-part, true, target-height - 1.5em.to-absolute(), full-width, inner-width)
       outer-top-part = result.top-part
       inner-part = result.bottom-part
 

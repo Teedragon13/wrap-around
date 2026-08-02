@@ -31,6 +31,9 @@
   padding: (h: 1em, v: 0.5em),
   indent-first-line: false
 ) = {context [
+    #let has-top-content = alignment.y != top and alignment.y != none
+    #let has-bottom-content = alignment.y != bottom
+
     #let original-spacing = par.spacing
     #set par(spacing: 0em)
     #layout(size => {
@@ -55,15 +58,15 @@
         size.width,
         wrapper-width,
         wrapped-height,
-        alignment.y != top,
-        alignment.y != bottom,
+        has-top-content,
+        has-bottom-content,
       )
 
       let inner-height = measure(result.inner, width: wrapper-width).height
 
       let inner-wrapper = block(width: 100%)[
         #set par(spacing: original-spacing)
-        #if indent-first-line and alignment.y == top {h(par.first-line-indent.amount)}
+        #if indent-first-line and not has-top-content {h(par.first-line-indent.amount)}
         #result.inner
         #if alignment.y != bottom {linebreak(justify: par.justify)}
       ]
