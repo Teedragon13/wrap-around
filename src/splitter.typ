@@ -318,7 +318,7 @@
   content-to-split,
   full-width,
   inner-width,
-  inner-height,
+  target-inner-height,
   has-outer-top,
   has-outer-bottom,
 ) = {
@@ -328,24 +328,52 @@
 
   let full-height = measure(inner-part, width: inner-width).height
 
-  if (full-height > inner-height) {
+  if (full-height > target-inner-height) {
     if has-outer-top and has-outer-bottom {
-      let outer-height = (full-height - inner-height) / 2
+      let outer-height = (full-height - target-inner-height) / 2
       let target-height = measure(inner-part, width: full-width).height * (outer-height / full-height)
 
-      let result = split((top: [], bottom: []), inner-part, true, target-height - 1.5em.to-absolute(), full-width, inner-width)
+      let result = split(
+        (top: [], bottom: []),
+        inner-part,
+        true,
+        target-height - 1em.to-absolute(),
+        full-width,
+        inner-width
+      )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
 
-      result = split((top: [], bottom: []), inner-part, true, inner-height, inner-width, full-width)
+      result = split(
+        (top: [], bottom: []),
+        inner-part,
+        true,
+        target-inner-height,
+        inner-width,
+        full-width
+      )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
     } else if has-outer-top {
-      let result = split((top: [], bottom: []), inner-part, false, inner-height, full-width, inner-width)
+      let result = split(
+        (top: [], bottom: []),
+        inner-part,
+        false,
+        target-inner-height,
+        full-width,
+        inner-width
+      )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
     } else if has-outer-bottom {
-      let result = split((top: [], bottom: []), inner-part, true, inner-height, inner-width, full-width)
+      let result = split(
+        (top: [], bottom: []),
+        inner-part,
+        true,
+        target-inner-height,
+        inner-width,
+        full-width
+      )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
     }

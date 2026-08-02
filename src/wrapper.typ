@@ -29,80 +29,115 @@
   alignment: top + right,
   width: 50%,
   padding: (h: 1em, v: 0.5em),
-  indent-first-line: false
+  indent-first-line: false,
+  debug-wrap: false,
+  debug-split: false,
 ) = {context [
-    #let has-top-content = alignment.y != top and alignment.y != none
-    #let has-bottom-content = alignment.y != bottom
+  #let calc-top-wrapper = alignment.y != top and alignment.y != none
+  #let calc-bottom-wrapper = alignment.y != bottom
 
-    #let original-spacing = par.spacing
-    #set par(spacing: 0em)
-    #layout(size => {
-      set par(spacing: original-spacing)
+  #let original-spacing = par.spacing
 
-      // let indent-first-line = content-before-wrap-is-par()
+  #layout(size => {
+    set par(spacing: original-spacing)
 
-      let wrapped = add-padding(wrapped-body, padding: padding)
+    // let indent-first-line = content-before-wrap-is-par()
 
-      // let wrapped-body = {
-      //   set par(spacing: original-spacing)
-      //   wrapped-body
-      // }
+    let wrapped = add-padding(wrapped-body, padding: padding)
 
-      let wrapper-width = size.width * (100% - width)
-      let wrapped-width = size.width * width
-      let wrapped-height = measure(wrapped, width: wrapped-width).height
+    // let wrapped-body = {
+    //   set par(spacing: original-spacing)
+    //   wrapped-body
+    // }
 
-      let wrapper-body-valid = wrapper-body.func() != [ ].func() and wrapper-body.func() != parbreak()
-      let result = splitter(
-        wrapper-body,
-        size.width,
-        wrapper-width,
-        wrapped-height,
-        has-top-content,
-        has-bottom-content,
-      )
+    let wrapper-width = size.width * (100% - width)
+    let wrapped-width = size.width * width
+    let wrapped-height = measure(wrapped, width: wrapped-width).height
 
-      let inner-height = measure(result.inner, width: wrapper-width).height
+    let wrapper-body-valid = wrapper-body.func() != [ ].func() and wrapper-body.func() != parbreak()
+    let result = splitter(
+      wrapper-body,
+      size.width,
+      wrapper-width,
+      wrapped-height,
+      calc-top-wrapper,
+      calc-bottom-wrapper,
+    )
 
-      let inner-wrapper = block(width: 100%)[
-        #set par(spacing: original-spacing)
-        #if indent-first-line and not has-top-content {h(par.first-line-indent.amount)}
-        #result.inner
-        #if alignment.y != bottom {linebreak(justify: par.justify)}
+    let outer-top-height = measure(result.outer-top, width: size.width).height
+
+    let inner-height = measure(result.inner, width: wrapper-width).height
+
+    let outer-bottom-height = measure(result.outer-bottom, width: size.width).height
+
+    let has-outer-top = calc-top-wrapper and outer-top-height > 0pt
+    let has-outer-bottom = calc-bottom-wrapper and outer-bottom-height > 0pt
+
+    let outer-top-wrapper = block(width: 100%)[
+      #set par(spacing: original-spacing)
+      #if indent-first-line {h(par.first-line-indent.amount)}
+      #result.outer-top
+      #linebreak(justify: par.justify)
+    ]
+
+    let outer-bottom-wrapper = block(width: 100%)[
+      #set par(spacing: original-spacing)
+      #result.outer-bottom
+    ]
+
+    let inner-wrapper = block(width: 100%)[
+      #set par(spacing: original-spacing)
+      #if indent-first-line and not has-outer-top {h(par.first-line-indent.amount)}
+      #result.inner
+      #if has-outer-bottom {linebreak(justify: par.justify)}
+    ]
+
+    if debug-wrap {
+      wrapped = block(stroke: red, wrapped)
+      inner-wrapper = block(stroke: blue, inner-wrapper)
+      outer-top-wrapper = block(stroke: yellow, outer-top-wrapper)
+      outer-bottom-wrapper = block(stroke: green, outer-bottom-wrapper)
+    }
+
+    [
+      #set par(spacing: par.leading)
+
+      #if has-outer-top {outer-top-wrapper}
+
+      #box(width: 100%, stroke: if debug-wrap {black} else {none}, grid(
+        gutter: 0cm,
+        columns: if alignment.x == left {(width, 100% - width)}
+                  else {(100% - width, width)},
+        align: horizon,
+
+        if alignment.x == left {wrapped} else {inner-wrapper},
+        if alignment.x == left {inner-wrapper} else {wrapped}
+      ))
+
+      #if has-outer-bottom {outer-bottom-wrapper}
+
+      #if debug-wrap {
+        place(horizon + left, box(fill: rgb("#ffffffdd"), inset: 1em)[
+          #if inner-height < wrapped-height {
+            text(fill: red)[inner-height < wrapped-height!]
+          }
+          Width = #size.width (1/2 = #{size.width/2})
+          \
+          Wrapper: width = #wrapper-width, height = #inner-height\
+          Wrapped: width = #wrapped-width, height = #wrapped-height
+          \
+          #text(fill: yellow)[outer-top-wrapper]
+          #text(fill: blue)[inner-wrapper]
+          #text(fill: green)[outer-bottom-wrapper]
+          #text(fill: red)[wrapped]
+          #text(fill: black)[inner-wrapper/wrapped - grid]
+        ])
+      }
+      #if debug-split [
+        \ outer-top = #result.outer-top.fields()
+        \ inner = #result.inner.fields()
+        \ outer-bottom = #result.outer-bottom.fields()
       ]
-
-      let outer-top-wrapper = block(width: 100%)[
-        #set par(spacing: original-spacing)
-        #if indent-first-line and alignment.y != top {h(par.first-line-indent.amount)}
-        #result.outer-top
-        #linebreak(justify: par.justify)
-      ]
-
-      let outer-bottom-wrapper = block(width: 100%)[
-        #set par(spacing: original-spacing)
-        #result.outer-bottom
-      ]
-
-      [
-        #set par(spacing: par.leading)
-
-        #if alignment.y != top {outer-top-wrapper}
-
-        #box(width: 100%, grid(
-          columns: if alignment.x == left {
-            (width, 100% - width)
-          } else {
-            (100% - width, width)
-          },
-          align: if inner-height < wrapped-height {top} else {horizon},
-
-          if alignment.x == left {wrapped} else {inner-wrapper},
-          if alignment.x == left {inner-wrapper} else {wrapped}
-        ))
-
-        #if alignment.y != bottom {outer-bottom-wrapper}
-      ]
-    })
-    #box(width: 100%, height: 0cm)
-  ]
-}
+    ]
+  })
+]}
