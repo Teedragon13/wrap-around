@@ -119,7 +119,8 @@
       #if debug-wrap {
         place(alignment.y + center,
           dy: if alignment.y == top or alignment.y == none {1em}
-              else if alignment.y == bottom {-1em},
+              else if alignment.y == bottom {-1em}
+              else {0cm},
           box(
             fill: rgb("#ffffffdd"),
             stroke: rgb("#00000022"),

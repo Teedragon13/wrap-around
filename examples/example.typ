@@ -7,17 +7,17 @@
   justify: true,
 )
 
-#let lorem-length = 170
+#let lorem-length = 140
 
 #[
-  #wrap(alignment: horizon)[
+  #wrap(alignment: bottom)[
     #text(fill: red, lorem(3))
     #text(fill: orange, lorem(4))
     #text(fill: yellow, lorem(2))
     #text(fill: green, lorem(20))
     #text(fill: blue, lorem(2))
     #text(fill: purple, lorem(5))
-    #text(fill: fuchsia, lorem(200))
+    // #text(fill: fuchsia, lorem(200))
     #text(fill: black, lorem(200))
   ][
     #figure(caption: "Some figure",
