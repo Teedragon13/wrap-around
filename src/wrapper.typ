@@ -52,7 +52,17 @@
 
     let wrapper-width = size.width * (100% - width)
     let wrapped-width = size.width * width
+
     let wrapped-height = measure(wrapped, width: wrapped-width).height
+
+    let add-inner-block(
+      inner
+    ) = block(width: 100%)[
+      #set par(spacing: original-spacing)
+      #if indent-first-line and not calc-top-wrapper {h(par.first-line-indent.amount)}
+      #inner
+      #if calc-bottom-wrapper {linebreak(justify: par.justify)}
+    ]
 
     let wrapper-body-valid = wrapper-body.func() != [ ].func() and wrapper-body.func() != parbreak()
     let result = splitter(
@@ -62,6 +72,7 @@
       wrapped-height,
       calc-top-wrapper,
       calc-bottom-wrapper,
+      add-inner-block,
     )
 
     let outer-top-height = measure(result.outer-top, width: size.width).height

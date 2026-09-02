@@ -13,6 +13,7 @@
   sequence-to-split,
   target-height,
   target-width,
+  add-target-block,
   split,
 ) = {
   let children = sequence-to-split.children
@@ -27,6 +28,7 @@
     }
 
     let top-part = split-content.top + children.slice(0, i + 1).join()
+    top-part = add-target-block(top-part)
     let height = measure(top-part, width: target-width).height
 
     if (height >= target-height) {break} else {i += 1}
@@ -50,6 +52,7 @@
       child-to-split,
       target-height,
       target-width,
+      add-target-block,
     )
 
     return (
@@ -64,6 +67,7 @@
   sequence-to-split,
   target-height,
   target-width,
+  add-target-block,
   split,
 ) = {
   let children = sequence-to-split.children
@@ -78,6 +82,7 @@
     }
 
     let bottom-part = children.slice(i, children.len()).join() + split-content.bottom
+    bottom-part = add-target-block(bottom-part)
     let height = measure(bottom-part, width: target-width).height
 
     if (height >= target-height) {break} else {i -= 1}
@@ -101,6 +106,7 @@
       child-to-split,
       target-height,
       target-width,
+      add-target-block,
     )
 
     return (
@@ -115,6 +121,7 @@
   styled-to-split,
   target-height,
   target-width,
+  add-target-block,
   split
 ) = {
   let child = styled-to-split.child
@@ -124,6 +131,7 @@
     child,
     target-height,
     target-width,
+    add-target-block,
   )
 
   let top-styled = (result.top-part, styled-to-split.styles)
@@ -140,6 +148,7 @@
   emph-to-split,
   target-height,
   target-width,
+  add-target-block,
   split
 ) = {
   let body = emph-to-split.body
@@ -149,6 +158,7 @@
     body,
     target-height,
     target-width,
+    add-target-block,
   )
 
   return (
@@ -162,6 +172,7 @@
   text-to-split,
   target-height,
   target-width,
+  add-target-block,
   split
 ) = {
   let words = text-to-split.text.split(" ")
@@ -169,6 +180,7 @@
   let i = 0
   while i < words.len() {
     let top-part = split-content.top + words.slice(0, i + 1).join(" ")
+    top-part = add-target-block(top-part)
     let height = measure(top-part, width: target-width).height
 
     if (height >= target-height) {break} else {i += 1}
@@ -195,13 +207,15 @@
   text-to-split,
   target-height,
   target-width,
-  split
+  add-target-block,
+  split,
 ) = {
   let words = text-to-split.text.split(" ")
 
   let i = words.len() - 1
   while i >= 0 {
     let bottom-part = words.slice(i, words.len()).join(" ") + split-content.bottom
+    bottom-part = add-target-block(bottom-part)
     let height = measure(bottom-part, width: target-width).height
 
     if (height >= target-height) {break} else {i -= 1}
@@ -228,6 +242,7 @@
   content-to-split,
   target-height,
   target-width,
+  add-target-block,
 ) = {
   let result = (top-part: content-to-split, bottom-part: [])
   
@@ -236,13 +251,13 @@
   assert(content-to-split.func() != space, message: "content-to-split is a space. Normally split-sequence should prevent this from happening.")
   
   if content-to-split.func() == sequence {
-    result = split-sequence-top(split-content, content-to-split, target-height, target-width, split-top)
+    result = split-sequence-top(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
   } else if content-to-split.func() == styled {
-    result = split-styled(split-content, content-to-split, target-height, target-width, split-top)
+    result = split-styled(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
   } else if content-to-split.func() == text {
-    result = split-text-top(split-content, content-to-split, target-height, target-width, split-top)
+    result = split-text-top(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
   } else if content-to-split.func() == emph {
-    result = split-emph(split-content, content-to-split, target-height, target-width, split-top)
+    result = split-emph(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
   } else if content-to-split.func() == parbreak {
     // Default
   } else if content-to-split.func() == figure {
@@ -265,6 +280,7 @@
   content-to-split,
   target-height,
   target-width,
+  add-target-block,
 ) = {
   let result = (top-part: [], bottom-part: content-to-split)
   
@@ -273,13 +289,13 @@
   assert(content-to-split.func() != space, message: "content-to-split is a space. Normally split-sequence should prevent this from happening.")
   
   if content-to-split.func() == sequence {
-    result = split-sequence-bottom(split-content, content-to-split, target-height, target-width, split-bottom)
+    result = split-sequence-bottom(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
   } else if content-to-split.func() == styled {
-    result = split-styled(split-content, content-to-split, target-height, target-width, split-bottom)
+    result = split-styled(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
   } else if content-to-split.func() == text {
-    result = split-text-bottom(split-content, content-to-split, target-height, target-width, split-bottom)
+    result = split-text-bottom(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
   } else if content-to-split.func() == emph {
-    result = split-emph(split-content, content-to-split, target-height, target-width, split-bottom)
+    result = split-emph(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
   } else if content-to-split.func() == parbreak {
     // Default
   } else if content-to-split.func() == figure {
@@ -304,6 +320,7 @@
   target-inner-height,
   has-outer-top,
   has-outer-bottom,
+  add-target-block,
 ) = {
   let outer-top-part = []
   let inner-part = content-to-split
@@ -321,6 +338,7 @@
         inner-part,
         target-height - 1em.to-absolute(),
         full-width,
+        it => it
       )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
@@ -330,6 +348,7 @@
         inner-part,
         target-inner-height,
         inner-width,
+        add-target-block,
       )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
@@ -338,7 +357,8 @@
         (top: [], bottom: []),
         inner-part,
         target-inner-height,
-        inner-width
+        inner-width,
+        add-target-block,
       )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
@@ -348,6 +368,7 @@
         inner-part,
         target-inner-height,
         inner-width,
+        add-target-block,
       )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
