@@ -2,6 +2,7 @@
 #let sequence = [].func()
 #let space = [ ].func()
 #let styled = text(white)[].func()
+#let symbol = [...].func()
 
 #let xor(a, b) = {
   return (not a and b) or (a and not b)
@@ -54,6 +55,7 @@
           i -= 1
         }
       }
+
     } else {
       i = calc.clamp(i + a, 0, children.len() - 1)
       
@@ -307,6 +309,14 @@
     result = split-emph(split-content, content-to-split, target-is-top, target-height, top-width, bottom-width, split)
   } else if content-to-split.func() == parbreak {
     // Default
+  } else if content-to-split.func() == figure {
+    // Default
+  } else if content-to-split.func() == image {
+    // Default
+  } else if content-to-split.func() == symbol {
+    // Default
+  } else if content-to-split.func() == smartquote {
+    // Sollte in split-sequence behoben werden
   } else {
     panic(content-to-split, content-to-split.func())
   }

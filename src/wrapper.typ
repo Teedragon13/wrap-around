@@ -117,21 +117,29 @@
       #if has-outer-bottom {outer-bottom-wrapper}
 
       #if debug-wrap {
-        place(horizon + left, box(fill: rgb("#ffffffdd"), inset: 1em)[
-          #if inner-height < wrapped-height {
-            text(fill: red)[inner-height < wrapped-height!]
-          }
-          Width = #size.width (1/2 = #{size.width/2})
-          \
-          Wrapper: width = #wrapper-width, height = #inner-height\
-          Wrapped: width = #wrapped-width, height = #wrapped-height
-          \
-          #text(fill: yellow)[outer-top-wrapper]
-          #text(fill: blue)[inner-wrapper]
-          #text(fill: green)[outer-bottom-wrapper]
-          #text(fill: red)[wrapped]
-          #text(fill: black)[inner-wrapper/wrapped - grid]
-        ])
+        place(alignment.y + center,
+          dy: if alignment.y == top or alignment.y == none {1em}
+              else if alignment.y == bottom {-1em},
+          box(
+            fill: rgb("#ffffffdd"),
+            stroke: rgb("#00000022"),
+            inset: 1em,
+            align(left)[
+              #if inner-height < wrapped-height {
+                text(fill: red)[inner-height < wrapped-height!]
+              }
+              \ Width = #size.width (1/2 = #{size.width/2})
+              \ Wrapper: width = #wrapper-width, height = #inner-height
+              \ Wrapped: width = #wrapped-width, height = #wrapped-height
+              \
+              #text(fill: yellow)[outer-top-wrapper]
+              #text(fill: blue)[inner-wrapper]
+              #text(fill: green)[outer-bottom-wrapper]
+              #text(fill: red)[wrapped]
+              #text(fill: black)[inner-wrapper/wrapped - grid]
+            ]
+          )
+        )
       }
       #if debug-split [
         \ outer-top = #result.outer-top.fields()
