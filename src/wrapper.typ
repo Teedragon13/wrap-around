@@ -119,7 +119,7 @@
         gutter: 0cm,
         columns: if alignment.x == left {(width, 100% - width)}
                   else {(100% - width, width)},
-        align: horizon,
+        align: if (inner-height < wrapped-height and alignment.y != horizon) {top} else {horizon},
 
         if alignment.x == left {wrapped} else {inner-wrapper},
         if alignment.x == left {inner-wrapper} else {wrapped}
@@ -154,6 +154,7 @@
         )
       }
       #if debug-split [
+        \ split = #result.debug
         \ outer-top = #result.outer-top.fields()
         \ inner = #result.inner.fields()
         \ outer-bottom = #result.outer-bottom.fields()

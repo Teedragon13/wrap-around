@@ -37,7 +37,8 @@
   if (i == children.len()) {
     return (
       top-part: sequence-to-split,
-      bottom-part: []
+      bottom-part: [],
+      debug: (sequence)
     )
   } else {
     let top-sequence = children.slice(0, i).join()
@@ -57,7 +58,8 @@
 
     return (
       top-part: top-sequence + result.top-part,
-      bottom-part: result.bottom-part + bottom-sequence
+      bottom-part: result.bottom-part + bottom-sequence,
+      debug: (sequence: (i, child-to-split, result.debug))
     )
   }
 }
@@ -91,7 +93,8 @@
   if (i < 0) {
     return (
       top-part: [],
-      bottom-part: sequence-to-split
+      bottom-part: sequence-to-split,
+      debug: (sequence)
     )
   } else {
     let top-sequence = children.slice(0, i).join()
@@ -111,7 +114,8 @@
 
     return (
       top-part: top-sequence + result.top-part,
-      bottom-part: result.bottom-part + bottom-sequence
+      bottom-part: result.bottom-part + bottom-sequence,
+      debug: (sequence: (i, child-to-split, result.debug))
     )
   }
 }
@@ -139,7 +143,8 @@
 
   return (
     top-part: styled(..top-styled),
-    bottom-part: styled(..bottom-styled)
+    bottom-part: styled(..bottom-styled),
+    debug: (styled: result.debug)
   )
 }
 
@@ -163,7 +168,8 @@
 
   return (
     top-part: emph(result.top-part),
-    bottom-part: emph(result.bottom-part)
+    bottom-part: emph(result.bottom-part),
+    debug: (emph: result.debug)
   )
 }
 
@@ -189,7 +195,8 @@
   if (i >= words.len()) {
     return (
       top-part: text-to-split,
-      bottom-part: []
+      bottom-part: [],
+      debug: (text)
     )
   } else {
     let top-text = words.slice(0, i + 1).join(" ")
@@ -197,7 +204,8 @@
 
     return (
       top-part: top-text,
-      bottom-part: bottom-text
+      bottom-part: bottom-text,
+      debug: (text: (i, words.at(i)))
     )
   }
 }
@@ -224,15 +232,21 @@
   if (i < 0) {
     return (
       top-part: [],
-      bottom-part: text-to-split
+      bottom-part: text-to-split,
+      debug: (text)
     )
   } else {
+    let word = words.at(i);
+    // Prevent that bottom part begins with ".", ",", "?", or "!"
+    if word.first() == "." or word.first() == "," or word.first() == "?" or word.first() == "!" {i += 1} 
+    
     let top-text = words.slice(0, i).join(" ")
     let bottom-text = words.slice(i, words.len()).join(" ")
 
     return (
       top-part: top-text,
-      bottom-part: bottom-text
+      bottom-part: bottom-text,
+      debug: (text: (i, words.at(i))),
     )
   }
 }
@@ -249,6 +263,7 @@
   assert(content-to-split.func() != ref, message: "content-to-split is a ref. Normally split-sequence should prevent this from happening.")
   assert(content-to-split.func() != cite, message: "content-to-split is a cite. Normally split-sequence should prevent this from happening.")
   assert(content-to-split.func() != space, message: "content-to-split is a space. Normally split-sequence should prevent this from happening.")
+  assert(content-to-split.func() != smartquote, message: "content-to-split is a smartquote. Normally split-sequence should prevent this from happening.")
   
   if content-to-split.func() == sequence {
     result = split-sequence-top(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
@@ -260,14 +275,19 @@
     result = split-emph(split-content, content-to-split, target-height, target-width, add-target-block, split-top)
   } else if content-to-split.func() == parbreak {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: (parbreak))
   } else if content-to-split.func() == figure {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: (figure))
   } else if content-to-split.func() == image {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: (image))
   } else if content-to-split.func() == symbol {
     // Default
-  } else if content-to-split.func() == smartquote {
-    // Sollte in split-sequence behoben werden
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: (symbol))
+  } else if content-to-split.func() == raw {
+    // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "raw")
   } else {
     panic(content-to-split, content-to-split.func())
   }
@@ -287,6 +307,8 @@
   assert(content-to-split.func() != ref, message: "content-to-split is a ref. Normally split-sequence should prevent this from happening.")
   assert(content-to-split.func() != cite, message: "content-to-split is a cite. Normally split-sequence should prevent this from happening.")
   assert(content-to-split.func() != space, message: "content-to-split is a space. Normally split-sequence should prevent this from happening.")
+  assert(content-to-split.func() != smartquote, message: "content-to-split is a smartquote. Normally split-sequence should prevent this from happening.")
+  assert(content-to-split.func() != smartquote, message: "content-to-split is a smartquote. Normally split-sequence should prevent this from happening.")
   
   if content-to-split.func() == sequence {
     result = split-sequence-bottom(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
@@ -298,14 +320,19 @@
     result = split-emph(split-content, content-to-split, target-height, target-width, add-target-block, split-bottom)
   } else if content-to-split.func() == parbreak {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "parbreak")
   } else if content-to-split.func() == figure {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "figure")
   } else if content-to-split.func() == image {
     // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "image")
   } else if content-to-split.func() == symbol {
     // Default
-  } else if content-to-split.func() == smartquote {
-    // Sollte in split-sequence behoben werden
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "symbol")
+  } else if content-to-split.func() == raw {
+    // Default
+    result = (top-part: result.top-part, bottom-part: result.bottom-part, debug: "raw")
   } else {
     panic(content-to-split, content-to-split.func())
   }
@@ -325,6 +352,7 @@
   let outer-top-part = []
   let inner-part = content-to-split
   let outer-bottom-part = []
+  let debug = []
 
   let full-height = measure(inner-part, width: inner-width).height
 
@@ -342,6 +370,7 @@
       )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
+      debug = result.debug
 
       result = split-top(
         (top: [], bottom: []),
@@ -352,6 +381,7 @@
       )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
+      debug += result.debug
     } else if has-outer-top {
       let result = split-bottom(
         (top: [], bottom: []),
@@ -362,6 +392,7 @@
       )
       outer-top-part = result.top-part
       inner-part = result.bottom-part
+      debug = result.debug
     } else if has-outer-bottom {
       let result = split-top(
         (top: [], bottom: []),
@@ -372,8 +403,9 @@
       )
       inner-part = result.top-part
       outer-bottom-part = result.bottom-part
+      debug = result.debug
     }
   }
 
-  return (inner: inner-part, outer-top: outer-top-part, outer-bottom: outer-bottom-part)
+  return (inner: inner-part, outer-top: outer-top-part, outer-bottom: outer-bottom-part, debug: debug)
 }
